@@ -4,11 +4,13 @@ package io.aobo;
 import io.aobo.statemachine.leave.LeaveEvents;
 import io.aobo.statemachine.leave.LeaveStates;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +21,10 @@ public class LeaveService {
 
     public LeaveStates sendEvent(String leaveId, LeaveEvents event) throws Exception {
         StateMachine<LeaveStates, LeaveEvents> sm = leaveFactory.getStateMachine(leaveId);
-        sm.start();
+        sm.startReactively().block();
         persister.restore(sm, leaveId);
-        sm.sendEvent(MessageBuilder.withPayload(event).build());
+        Mono<Message<LeaveEvents>> messageMono = Mono.just(MessageBuilder.withPayload(event).build());
+        sm.sendEvent(messageMono).blockLast();
         persister.persist(sm, leaveId);
         return sm.getState().getId();
     }

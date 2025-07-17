@@ -1,6 +1,7 @@
 
 package io.aobo.statemachine.leave;
 
+import io.aobo.statemachine.leave.actions.SendApprovalNotificationAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -17,10 +18,8 @@ public class LeaveStateMachineConfig extends EnumStateMachineConfigurerAdapter<L
     private final LeaveStateMachineListener listener;
 
     @Override
-    public void configure(StateMachineConfigurationConfigurer<LeaveStates, LeaveEvents> config)
-            throws Exception {
-        config
-                .withConfiguration()
+    public void configure(StateMachineConfigurationConfigurer<LeaveStates, LeaveEvents> config) throws Exception {
+        config.withConfiguration()
                 .autoStartup(true)
                 .listener(listener);
     }
@@ -30,14 +29,23 @@ public class LeaveStateMachineConfig extends EnumStateMachineConfigurerAdapter<L
         states.withStates()
                 .initial(LeaveStates.SUBMITTED)
                 .state(LeaveStates.APPROVED)
-                .state(LeaveStates.REJECTED);
+                .state(LeaveStates.REJECTED)
+                .end(LeaveStates.APPROVED)
+                .end(LeaveStates.REJECTED);
     }
 
     @Override
     public void configure(StateMachineTransitionConfigurer<LeaveStates, LeaveEvents> transitions) throws Exception {
         transitions
-                .withExternal().source(LeaveStates.SUBMITTED).target(LeaveStates.APPROVED).event(LeaveEvents.APPROVE)
+                .withExternal()
+                .source(LeaveStates.SUBMITTED)
+                .action(new SendApprovalNotificationAction())
+                .target(LeaveStates.APPROVED)
+                .event(LeaveEvents.APPROVE)
+
                 .and()
-                .withExternal().source(LeaveStates.SUBMITTED).target(LeaveStates.REJECTED).event(LeaveEvents.REJECT);
+                .withExternal().source(LeaveStates.SUBMITTED)
+                .target(LeaveStates.REJECTED)
+                .event(LeaveEvents.REJECT);
     }
 }

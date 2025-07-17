@@ -17,6 +17,16 @@ public class LeaveStateMachineListener extends StateMachineListenerAdapter<Leave
     }
 
     @Override
+    public void stateEntered(State<LeaveStates, LeaveEvents> state) {
+        System.out.println("[监听器] 进入状态: " + state.getId());
+    }
+
+    @Override
+    public void stateExited(State<LeaveStates, LeaveEvents> state) {
+        System.out.println("[监听器] 状态结束: " + state.getId());
+    }
+
+    @Override
     public void eventNotAccepted(Message<LeaveEvents> event) {
         System.err.println("[监听器] 事件未被接受: " + event.getPayload());
     }
