@@ -14,6 +14,12 @@ public class LeaveController {
 
     private final LeaveService leaveService;
 
+    @PostMapping("/start")
+    public ResponseEntity<String> start() throws Exception {
+        String leaveId = leaveService.start();
+        return ResponseEntity.ok(leaveId);
+    }
+
     @PostMapping("/{id}/approve")
     public ResponseEntity<String> approve(@PathVariable String id) throws Exception {
         LeaveStates state = leaveService.sendEvent(id, LeaveEvents.APPROVE);

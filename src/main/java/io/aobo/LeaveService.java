@@ -12,6 +12,8 @@ import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class LeaveService {
@@ -27,5 +29,13 @@ public class LeaveService {
         sm.sendEvent(messageMono).blockLast();
         persister.persist(sm, leaveId);
         return sm.getState().getId();
+    }
+
+    public String start() throws Exception {
+        String leaveId = UUID.randomUUID().toString();
+        StateMachine<LeaveStates, LeaveEvents> sm = leaveFactory.getStateMachine(leaveId);
+        sm.startReactively().block();
+        persister.persist(sm, leaveId);
+        return leaveId;
     }
 }

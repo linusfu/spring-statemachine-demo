@@ -20,14 +20,14 @@ public class LeaveStateMachineConfig extends EnumStateMachineConfigurerAdapter<L
     @Override
     public void configure(StateMachineConfigurationConfigurer<LeaveStates, LeaveEvents> config) throws Exception {
         config.withConfiguration()
-                .autoStartup(true)
+                .autoStartup(false)
                 .listener(listener);
     }
 
     @Override
     public void configure(StateMachineStateConfigurer<LeaveStates, LeaveEvents> states) throws Exception {
         states.withStates()
-                .initial(LeaveStates.SUBMITTED)
+                .initial(LeaveStates.DRAFT)
                 .state(LeaveStates.APPROVED)
                 .state(LeaveStates.REJECTED)
                 .end(LeaveStates.APPROVED)
@@ -38,13 +38,13 @@ public class LeaveStateMachineConfig extends EnumStateMachineConfigurerAdapter<L
     public void configure(StateMachineTransitionConfigurer<LeaveStates, LeaveEvents> transitions) throws Exception {
         transitions
                 .withExternal()
-                .source(LeaveStates.SUBMITTED)
+                .source(LeaveStates.DRAFT)
                 .action(new SendApprovalNotificationAction())
                 .target(LeaveStates.APPROVED)
                 .event(LeaveEvents.APPROVE)
 
                 .and()
-                .withExternal().source(LeaveStates.SUBMITTED)
+                .withExternal().source(LeaveStates.DRAFT)
                 .target(LeaveStates.REJECTED)
                 .event(LeaveEvents.REJECT);
     }
