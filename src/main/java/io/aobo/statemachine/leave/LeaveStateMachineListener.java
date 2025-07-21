@@ -1,6 +1,7 @@
 package io.aobo.statemachine.leave;
 
 import org.springframework.messaging.Message;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Component;
@@ -29,5 +30,13 @@ public class LeaveStateMachineListener extends StateMachineListenerAdapter<Leave
     @Override
     public void eventNotAccepted(Message<LeaveEvents> event) {
         System.err.println("[监听器] 事件未被接受: " + event.getPayload());
+    }
+
+    @Override
+    public void stateMachineError(StateMachine<LeaveStates, LeaveEvents> stateMachine, Exception exception) {
+        System.out.println("❌ 状态机发生异常");
+        System.out.println("❌ 异常状态机: " + stateMachine);
+        System.out.println("❌ 异常信息: " + exception.getMessage());
+        throw new RuntimeException(exception);
     }
 }
