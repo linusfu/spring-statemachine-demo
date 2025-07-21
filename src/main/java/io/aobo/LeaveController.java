@@ -20,14 +20,14 @@ public class LeaveController {
         return ResponseEntity.ok(leaveId);
     }
 
-    @PostMapping("/{id}/approve")
-    public ResponseEntity<String> approve(@PathVariable String id) throws Exception {
+    @PostMapping("/approve")
+    public ResponseEntity<String> approve(@RequestParam String id) throws Exception {
         LeaveStates state = leaveService.sendEvent(id, LeaveEvents.APPROVE);
         return ResponseEntity.ok("State changed to: " + state);
     }
 
-    @PostMapping("/{id}/reject")
-    public ResponseEntity<String> reject(@PathVariable String id) throws Exception {
+    @PostMapping("/reject")
+    public ResponseEntity<String> reject(@RequestParam String id) throws Exception {
         LeaveStates state = leaveService.sendEvent(id, LeaveEvents.REJECT);
         return ResponseEntity.ok("State changed to: " + state);
     }

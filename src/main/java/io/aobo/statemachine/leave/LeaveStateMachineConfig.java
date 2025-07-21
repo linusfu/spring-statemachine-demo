@@ -1,7 +1,8 @@
 
 package io.aobo.statemachine.leave;
 
-import io.aobo.statemachine.leave.actions.SendApprovalNotificationAction;
+import io.aobo.statemachine.leave.actions.SendApprovedNotificationAction;
+import io.aobo.statemachine.leave.actions.SendRejectedNotificationAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -39,13 +40,14 @@ public class LeaveStateMachineConfig extends EnumStateMachineConfigurerAdapter<L
         transitions
                 .withExternal()
                 .source(LeaveStates.DRAFT)
-                .action(new SendApprovalNotificationAction())
                 .target(LeaveStates.APPROVED)
                 .event(LeaveEvents.APPROVE)
+                .action(new SendApprovedNotificationAction())
 
                 .and()
                 .withExternal().source(LeaveStates.DRAFT)
                 .target(LeaveStates.REJECTED)
-                .event(LeaveEvents.REJECT);
+                .event(LeaveEvents.REJECT)
+                .action(new SendRejectedNotificationAction());
     }
 }

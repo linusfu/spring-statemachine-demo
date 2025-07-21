@@ -23,9 +23,12 @@ public class LeaveService {
 
     public LeaveStates sendEvent(String leaveId, LeaveEvents event) throws Exception {
         StateMachine<LeaveStates, LeaveEvents> sm = leaveFactory.getStateMachine(leaveId);
-        sm.startReactively().block();
         persister.restore(sm, leaveId);
-        Mono<Message<LeaveEvents>> messageMono = Mono.just(MessageBuilder.withPayload(event).build());
+        Message<LeaveEvents> message = MessageBuilder.withPayload(event)
+                .setHeader("userId", "ufl1szh")
+                .setHeader("leaveId", leaveId)
+                .build();
+        Mono<Message<LeaveEvents>> messageMono = Mono.just(message);
         sm.sendEvent(messageMono).blockLast();
         persister.persist(sm, leaveId);
         return sm.getState().getId();
